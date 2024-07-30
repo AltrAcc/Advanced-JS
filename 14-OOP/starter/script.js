@@ -400,10 +400,12 @@ class Account {
 
     deposit(val) {
         this._movements.push(val);
+        return this;
     }
 
     withdraw(val) {
         this.deposit(-val);
+        return this;
     }
 
     _approveLoan(val) {
@@ -414,6 +416,7 @@ class Account {
         if(this._approveLoan(val)) {
             this.deposit(val);
             console.log('Loan approved');
+            return this;
         }
     }
 }
@@ -438,8 +441,132 @@ console.log(acc1.getMovements());
 // 4) Private methods
 // (there is also the static version)
 
+class Accounts {
+    // Public fields (on instances)
+    locale = navigator.language;
 
+    // Private fields (on instances)
+    #movements = [];
+    #pin;
 
+    constructor(owner, curr, pin) {
+        this.owner = owner;
+        this.curr = curr;
+        this.#pin = pin;
+        // this._movements = []; 
+        // this.locale = navigator.language;
 
+        console.log(`Thank for opening acc ${owner}`);
+    }
+    
+    // 3) Public methods
+    // Public interface
+    getMovements() {
+        return this.#movements;
+    }
 
+    deposit(val) {
+        this.#movements.push(val);
+    }
+
+    withdraw(val) {
+        this.deposit(-val);
+    }
+
+    requestLoan(val) {
+        if(this.#approveLoan(val)) {
+            this.deposit(val);
+            console.log('Loan approved');
+        }
+    }
+
+    static helper() {
+        console.log('Helper');
+    }
+
+    // 4. Private methods
+    #approveLoan(val) {
+        return true;
+    }
+}
+
+const acc2 = new Accounts('Janvi', 'EUR', 2222);
+console.log(acc2);
+// console.log(acc2.#movements);  can't access
+Accounts.helper();
+
+/////////////////////////////////////////////
+// 022 Chaining Methods
+
+acc1.deposit(300).deposit(500).requestLoan(5666).withdraw(666);
+console.log(acc1.getMovements());
+
+///////////////////////////////////////////////
+// 024 Coding Challenge #4
+/* Coding Challenge #4
+Your tasks:
+1. Re-create Challenge #3, but this time using ES6 classes: create an 'EVCl'
+child class of the 'CarCl' class
+2. Make the 'charge' property private
+3. Implement the ability to chain the 'accelerate' and 'chargeBattery'
+methods of this class, and also update the 'brake' method in the 'CarCl'
+class. Then experiment with chaining!
+Test data:
+§ Data car 1: 'Rivian' going at 120 km/h, with a charge of 23% */
+
+class CarCl {
+    constructor(make, speed) {
+      this.make = make;
+      this.speed = speed;
+    }
+  
+    accelerate() {
+      this.speed += 10;
+      console.log(`${this.make} is going at ${this.speed} km/h`);
+    }
+  
+    brake() {
+      this.speed -= 5;
+      console.log(`${this.make} is going at ${this.speed} km/h`);
+      return this;
+    }
+  
+    get speedUS() {
+      return this.speed / 1.6;
+    }
+  
+    set speedUS(speed) {
+      this.speed = speed * 1.6;
+    }
+  }
+  
+  class EVCl extends CarCl {
+    #charge;
+  
+    constructor(make, speed, charge) {
+      super(make, speed);
+      this.#charge = charge;
+    }
+  
+    chargeBattery(chargeTo) {
+      this.#charge = chargeTo;
+      return this;
+    }
+  
+    accelerate() {
+      this.speed += 20;
+      this.#charge--;
+      console.log(
+        `${this.make} is going at ${this.speed} km/h, with a charge of ${
+          this.#charge
+        }`
+      );
+      return this;
+    }
+  }
+  
+  const rivian = new EVCl('Rivian', 120, 23);
+  console.log(rivian);
+  rivian.accelerate().accelerate().brake().chargeBattery(50);
+  console.log(rivian.speedUS);
 
